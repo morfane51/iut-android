@@ -6,7 +6,9 @@ import android.graphics.Canvas;
 import android.util.Log;
 
 public class Player {
-    /** Static bitmap to reduce memory usage. */
+    /**
+     * Static bitmap to reduce memory usage.
+     */
     public static Bitmap globalBitmap;
     private final Bitmap bitmap;
     private final byte frameTime;
@@ -15,6 +17,8 @@ public class Player {
     private final int height;
     private int x;
     private int y;
+    private int top;
+    private int bottom;
     private float speedX;
     private float speedY;
     private GameView view;
@@ -23,15 +27,18 @@ public class Player {
         int height = context.getResources().getDisplayMetrics().heightPixels;
         int width = context.getResources().getDisplayMetrics().widthPixels;
 
-        if(globalBitmap == null) {
+        this.top = 0;
+        this.bottom = (height / 5) * 4;
+
+        if (globalBitmap == null) {
             Log.e("TEST", "Height : " + height + ", width : " + width);
             globalBitmap = Util.decodeSampledBitmapFromResource(context.getResources(), R.drawable.frame1, Float.valueOf(height / 10f).intValue(), Float.valueOf(width / 10f).intValue());
         }
         this.bitmap = globalBitmap;
         this.width = this.bitmap.getWidth();
         this.height = this.bitmap.getHeight();
-        this.frameTime = 3;		// the frame will change every 3 runs
-        this.y = context.getResources().getDisplayMetrics().heightPixels / 2;	// Startposition in the middle of the screen
+        this.frameTime = 3;        // the frame will change every 3 runs
+        this.y = context.getResources().getDisplayMetrics().heightPixels / 2;    // Startposition in the middle of the screen
 
         this.view = view;
         this.x = width / 6;
@@ -44,7 +51,7 @@ public class Player {
     }
 
     private float getPosTabIncrease() {
-        return - view.getHeight() / 100;
+        return -view.getHeight() / 100;
     }
 
     private float getTabSpeed() {
@@ -54,16 +61,16 @@ public class Player {
     public void move() {
         changeToNextFrame();
 
-        if(speedY < 0){
+        if (speedY < 0) {
             // The character is moving up
             Log.i("Move", "Moving up");
             speedY = speedY * 2 / 3 + getSpeedTimeDecrease() / 2;
-        }else{
+        } else {
             // the character is moving down
             Log.i("Move", "Moving down");
             this.speedY += getSpeedTimeDecrease();
         }
-        if(this.speedY > getMaxSpeed()){
+        if (this.speedY > getMaxSpeed()) {
             // speed limit
             this.speedY = getMaxSpeed();
         }
@@ -81,12 +88,32 @@ public class Player {
         }
 */
         this.x += speedX;
-        this.y += speedY;
+        if (speedY < 0) { // Moving up
+            if ((this.y + speedY) > this.top) {
+                this.y += speedY;
+            } else {
+                speedY = this.top - (this.y + speedY);
+
+                if (speedY < 0) {
+                    this.y += speedY;
+                }
+            }
+        } else { // Moving down
+            if ((this.y + speedY) < this.bottom) {
+                this.y += speedY;
+            } else {
+                speedY = this.bottom - (this.y + speedY);
+
+                if (speedY > 0) {
+                    this.y += speedY;
+                }
+            }
+        }
     }
 
-    protected void changeToNextFrame(){
+    protected void changeToNextFrame() {
         this.frameTimeCounter++;
-        if(this.frameTimeCounter >= this.frameTime){
+        if (this.frameTimeCounter >= this.frameTime) {
             //TODO Change frame
             this.frameTimeCounter = 0;
         }
@@ -101,6 +128,6 @@ public class Player {
     }
 
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bitmap, x, y , null);
+        canvas.drawBitmap(bitmap, x, y, null);
     }
 }
