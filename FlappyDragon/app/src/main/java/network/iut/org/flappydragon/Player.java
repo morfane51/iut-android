@@ -3,6 +3,7 @@ package network.iut.org.flappydragon;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.Log;
 
 public class Player {
@@ -22,6 +23,7 @@ public class Player {
     private float speedX;
     private float speedY;
     private GameView view;
+    private Rect rect;
 
     public Player(Context context, GameView view) {
         int height = context.getResources().getDisplayMetrics().heightPixels;
@@ -128,6 +130,11 @@ public class Player {
     }
 
     public void draw(Canvas canvas) {
+        rect = new Rect(x, y, width, height);
         canvas.drawBitmap(bitmap, x, y, null);
+    }
+
+    public Rect getRect() {
+        return rect;
     }
 }
