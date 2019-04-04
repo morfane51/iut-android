@@ -34,7 +34,7 @@ public class Player {
         this.y = context.getResources().getDisplayMetrics().heightPixels / 2;	// Startposition in the middle of the screen
 
         this.view = view;
-        this.x = this.width / 6;
+        this.x = width / 6;
         this.speedX = 0;
     }
 
