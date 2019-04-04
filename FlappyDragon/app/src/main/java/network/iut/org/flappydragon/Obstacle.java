@@ -5,15 +5,19 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import java.util.Random;
+
 public class Obstacle {
     private int height;
     private int width;
+    private int top;
     private int offset;
     private Rect rect;
 
     public Obstacle(Context context) {
         height = 150;
         width = 150;
+        top = new Random().nextInt((context.getResources().getDisplayMetrics().heightPixels / 4) * 3);
         offset = context.getResources().getDisplayMetrics().widthPixels;
     }
 
@@ -32,7 +36,7 @@ public class Obstacle {
     public boolean draw(Canvas canvas) {
         offset -= 30;
         if (offset + width >= 0) {
-            rect = new Rect(offset, 0, offset + width, height);
+            rect = new Rect(offset, top, offset + width, top + height);
             canvas.drawRect(rect, new Paint(123));
             return true;
         } else {
