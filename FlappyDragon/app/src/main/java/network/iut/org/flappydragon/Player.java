@@ -130,7 +130,7 @@ public class Player {
     }
 
     public void draw(Canvas canvas) {
-        rect = new Rect(x, y, width, height);
+        rect = new Rect(x, y, x + width, y + height);
         canvas.drawBitmap(bitmap, x, y, null);
     }
 
