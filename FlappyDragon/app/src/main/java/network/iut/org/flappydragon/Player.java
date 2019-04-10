@@ -3,11 +3,7 @@ package network.iut.org.flappydragon;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.util.Log;
 
 public class Player {
@@ -30,6 +26,7 @@ public class Player {
     private float LargeurEcran;
     public boolean loose;
     private GameView view;
+    private Rect rect;
 
     public Player(Context context, GameView view) {
         int height = context.getResources().getDisplayMetrics().heightPixels;
@@ -139,15 +136,18 @@ public class Player {
     }
 
     public void draw(Canvas canvas) {
-
+        rect = new Rect(x, y, x + width, y + height);
         if(!loose) {
             canvas.drawBitmap(bitmap, x, y, null);
         }
-
     }
     public void reset(){
 
         this.x= (int) this.LargeurEcran / 6;
         this.y= (int) this.hauteurEcran / 2 ;
+    }
+
+    public Rect getRect() {
+        return rect;
     }
 }

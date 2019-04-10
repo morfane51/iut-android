@@ -10,6 +10,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,11 +24,16 @@ public class GameView extends SurfaceView implements Runnable {
     private TimerTask timerTask;
     private Player player;
     private Background background;
+    private List<Obstacle> obstacles;
+    private Random r;
+    private Context context;
 
     public GameView(Context context) {
         super(context);
+        this.context = context;
         player = new Player(context, this);
         background = new Background(context);
+        obstacles = new ArrayList<>();
         holder = getHolder();
         new Thread(new Runnable() {
             @Override
@@ -33,6 +41,7 @@ public class GameView extends SurfaceView implements Runnable {
                 GameView.this.run();
             }
         }).start();
+        r = new Random();
     }
 
     @Override
@@ -90,9 +99,13 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void draw() {
-        while(!holder.getSurface().isValid()){
-			/*wait*/
-            try { Thread.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+        while (!holder.getSurface().isValid()) {
+            /*wait*/
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         Canvas canvas = holder.lockCanvas();
         if (canvas != null) {
@@ -105,9 +118,24 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void drawCanvas(Canvas canvas) {
+    private void drawCanvas(final Canvas canvas) {
         background.draw(canvas);
         player.draw(canvas);
+
+        for (Obstacle obstacle : obstacles) {
+            if (!obstacle.draw(canvas)) {
+                obstacle = null;
+            } else {
+                if (obstacle.intersect(player)) {
+                    Log.e("PERDU", "PERDU");
+                }
+            }
+        }
+
+        if (r.nextInt(100) >= 98) {
+            obstacles.add(new Obstacle(context));
+        }
+
         if (paused) {
             canvas.drawText("PAUSED", canvas.getWidth() / 2, canvas.getHeight() / 2, new Paint());
         }
