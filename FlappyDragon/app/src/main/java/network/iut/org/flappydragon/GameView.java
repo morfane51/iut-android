@@ -2,7 +2,9 @@ package network.iut.org.flappydragon;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -45,8 +47,9 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         performClick();
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (paused) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN){
+            if(paused || player.loose) {
+                    player.reset();
                 resume();
             } else {
                 Log.i("PLAYER", "PLAYER TAPPED");
@@ -58,6 +61,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void resume() {
         paused = false;
+        player.loose = false;
         startTimer();
     }
 
@@ -134,6 +138,17 @@ public class GameView extends SurfaceView implements Runnable {
 
         if (paused) {
             canvas.drawText("PAUSED", canvas.getWidth() / 2, canvas.getHeight() / 2, new Paint());
+        }
+        if(player.loose){
+            //BEFORE Paint dans player
+
+            Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mPaint.setTypeface(Typeface.create("Arial",Typeface.ITALIC));
+            mPaint.setTextSize(120);
+            String pageTitle = "YOU DIED";
+            float right = mPaint.measureText(pageTitle, 0, pageTitle.length());
+            mPaint.setColor(Color.RED);
+            canvas.drawText(pageTitle, canvas.getWidth() / 2-(right/2), canvas.getHeight() / 2, mPaint);
         }
     }
 
