@@ -3,6 +3,11 @@ package network.iut.org.flappydragon;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.Log;
 
 public class Player {
@@ -18,17 +23,22 @@ public class Player {
     private int x;
     private int y;
     private int top;
-    private int bottom;
+    private float bottom;
     private float speedX;
     private float speedY;
+    private float hauteurEcran;
+    private float LargeurEcran;
+    public boolean loose;
     private GameView view;
 
     public Player(Context context, GameView view) {
         int height = context.getResources().getDisplayMetrics().heightPixels;
         int width = context.getResources().getDisplayMetrics().widthPixels;
-
+        this.hauteurEcran=height;
+        this.LargeurEcran=width;
+        loose=false;
         this.top = 0;
-        this.bottom = (height / 5) * 4;
+        this.bottom =((float)height / 5) * (float)4.09;
 
         if (globalBitmap == null) {
             Log.e("TEST", "Height : " + height + ", width : " + width);
@@ -101,9 +111,10 @@ public class Player {
         } else { // Moving down
             if ((this.y + speedY) < this.bottom) {
                 this.y += speedY;
+
             } else {
                 speedY = this.bottom - (this.y + speedY);
-
+                loose=true;
                 if (speedY > 0) {
                     this.y += speedY;
                 }
@@ -128,6 +139,15 @@ public class Player {
     }
 
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bitmap, x, y, null);
+
+        if(!loose) {
+            canvas.drawBitmap(bitmap, x, y, null);
+        }
+
+    }
+    public void reset(){
+
+        this.x= (int) this.LargeurEcran / 6;
+        this.y= (int) this.hauteurEcran / 2 ;
     }
 }
