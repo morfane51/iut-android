@@ -117,6 +117,9 @@ public class Player {
                 }
             }
         }
+        if (this.y < 0) {
+            this.y = 0;
+        }
     }
 
     protected void changeToNextFrame() {

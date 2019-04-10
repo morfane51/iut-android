@@ -27,6 +27,8 @@ public class GameView extends SurfaceView implements Runnable {
     private List<Obstacle> obstacles;
     private Random r;
     private Context context;
+    private int score;
+    private int topScore;
 
     public GameView(Context context) {
         super(context);
@@ -35,6 +37,8 @@ public class GameView extends SurfaceView implements Runnable {
         background = new Background(context);
         obstacles = new ArrayList<>();
         holder = getHolder();
+        score = 0;
+        topScore = 0;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -47,9 +51,14 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         performClick();
-        if(event.getAction() == MotionEvent.ACTION_DOWN){
-            if(paused || player.loose) {
-                    player.reset();
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (paused || player.loose) {
+                player.reset();
+                if (score > topScore) {
+                    topScore = score;
+                }
+                score = 0;
+                obstacles.removeAll(obstacles);
                 resume();
             } else {
                 Log.i("PLAYER", "PLAYER TAPPED");
@@ -122,33 +131,60 @@ public class GameView extends SurfaceView implements Runnable {
         background.draw(canvas);
         player.draw(canvas);
 
-        for (Obstacle obstacle : obstacles) {
-            if (!obstacle.draw(canvas)) {
-                obstacle = null;
-            } else {
-                if (obstacle.intersect(player)) {
-                    Log.e("PERDU", "PERDU");
-                }
-            }
-        }
-
-        if (r.nextInt(100) >= 98) {
-            obstacles.add(new Obstacle(context));
-        }
-
         if (paused) {
             canvas.drawText("PAUSED", canvas.getWidth() / 2, canvas.getHeight() / 2, new Paint());
         }
-        if(player.loose){
+        if (player.loose) {
             //BEFORE Paint dans player
 
             Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mPaint.setTypeface(Typeface.create("Arial",Typeface.ITALIC));
+            mPaint.setTypeface(Typeface.create("Arial", Typeface.ITALIC));
             mPaint.setTextSize(120);
             String pageTitle = "YOU DIED";
             float right = mPaint.measureText(pageTitle, 0, pageTitle.length());
             mPaint.setColor(Color.RED);
-            canvas.drawText(pageTitle, canvas.getWidth() / 2-(right/2), canvas.getHeight() / 2, mPaint);
+            canvas.drawText(pageTitle, canvas.getWidth() / 2 - (right / 2), canvas.getHeight() / 2, mPaint);
+
+        } else {
+            for (Obstacle obstacle : obstacles) {
+                if (!obstacle.draw(canvas)) {
+                    obstacle = null;
+
+                } else {
+                    if (obstacle.intersect(player)) {
+                        player.loose = true;
+                    }
+                }
+            }
+
+            int ratio = score / 50;
+
+            if (ratio < 3) {
+                ratio = 3;
+            } else if (ratio > 50) {
+                ratio = 50;
+            }
+
+            if (r.nextInt(100) >= 100 - ratio) {
+                obstacles.add(new Obstacle(context));
+            }
+        }
+
+        Paint mPaint1 = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint1.setTypeface(Typeface.create("Arial", Typeface.ITALIC));
+        mPaint1.setTextSize(80);
+        String pageScore = score + "m";
+        float right2 = mPaint1.measureText(pageScore, 0, pageScore.length());
+        mPaint1.setColor(Color.WHITE);
+        canvas.drawText(pageScore, canvas.getWidth() / 2 - (right2 / 2), canvas.getHeight() / 10, mPaint1);
+
+        mPaint1.setTextSize(40);
+        String pageTopScore = topScore + "m";
+        mPaint1.setColor(Color.WHITE);
+        canvas.drawText(pageTopScore, canvas.getWidth() - mPaint1.measureText(pageTopScore, 0, pageTopScore.length()), 40, mPaint1);
+
+        if (!player.loose) {
+            score++;
         }
     }
 
